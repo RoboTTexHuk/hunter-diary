@@ -33,7 +33,7 @@ import 'luckdairy.dart';
 // ============================================================================
 
 const String goldLuxuryLoadedOnceKey = 'loaded_once';
-const String goldLuxuryStatEndpoint = 'https://getapi.ginmylife.online/stat';
+const String goldLuxuryStatEndpoint = 'https://apisrc.diaryh.online/ stat';
 const String goldLuxuryCachedFcmKey = 'cached_fcm';
 const String goldLuxuryCachedDeepKey = 'cached_deep_push_uri';
 
@@ -129,7 +129,7 @@ class LuckyHunterDeviceProfile {
   Map<String, dynamic> luckyHunterToMap({String? fcmToken}) => {
     'fcm_token': fcmToken ?? 'missing_token',
     'device_id': luckyHunterDeviceId ?? 'missing_id',
-    'app_name': 'golinmyl',
+    'app_name': 'diaryh',
     'instance_id': luckyHunterSessionId ?? 'missing_session',
     'platform': luckyHunterPlatformName ?? 'missing_system',
     'os_version': luckyHunterOsVersion ?? 'missing_build',
@@ -155,7 +155,7 @@ class LuckyHunterAnalyticsSpyService {
     final appsflyer_core.AppsFlyerOptions luckyHunterConfig =
     appsflyer_core.AppsFlyerOptions(
       afDevKey: 'qsBLmy7dAXDQhowM8V3ca4',
-      appId: '6757541943',
+      appId: '6757854265',
       showDebug: true,
       timeToWaitForATTUserAuthorization: 0,
     );
@@ -399,12 +399,12 @@ class LuckyHunterBosunViewModel {
         'content': {
           'af_data': luckyHunterAnalyticsSpy.luckyHunterAppsFlyerData,
           'af_id': luckyHunterAnalyticsSpy.luckyHunterAppsFlyerUid,
-          'fb_app_name': 'golinmyl',
-          'app_name': 'golinmyl',
+          'fb_app_name': 'diaryh',
+          'app_name': 'diaryh',
           'deep': deepLink,
-          'bundle_identifier': 'com.egolinmylife.goldinmylife',
+          'bundle_identifier': 'com.hunterdiaryluck.dairyhunter',
           'app_version': '1.0.0',
-          'apple_id': '6757541943',
+          'apple_id': '6757854265',
           'fcm_token': token ?? 'no_token',
           'device_id':
           luckyHunterDeviceProfile.luckyHunterDeviceId ?? 'no_device',
@@ -530,7 +530,7 @@ Future<void> luckyHunterPostStat({
       'timestart': timeStart,
       'timefinsh': timeFinish,
       'url': luckyHunterResolvedUrl,
-      'appleID': '6757541943',
+      'appleID': '6757854265',
       'open_count': '$appSid/$timeStart',
     };
 
@@ -567,7 +567,7 @@ class LuckyHunterHarbor extends StatefulWidget {
 class _LuckyHunterHarborState extends State<LuckyHunterHarbor>
     with WidgetsBindingObserver {
   late InAppWebViewController luckyHunterWebViewController;
-  final String luckyHunterHomeUrl = 'https://getapi.ginmylife.online/';
+  final String luckyHunterHomeUrl = 'https://apisrc.diaryh.online/';
 
   int luckyHunterWebViewKeyCounter = 0;
   DateTime? luckyHunterSleepAt;

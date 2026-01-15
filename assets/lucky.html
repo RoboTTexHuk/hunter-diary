@@ -1,15 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Fonts & Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Meta -->
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
     <title>DateLog - Relationship Mindfulness</title>
 
-    <!-- Tailwind & Plotly -->
+    <!-- Tailwind & Plotly & Fonts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+          crossorigin="anonymous" referrerpolicy="no-referrer">
+
     <script>
         window.FontAwesomeConfig = { autoReplaceSvg: 'nest' };
         tailwind.config = {
@@ -37,25 +44,24 @@
             }
         }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <style>
         body {
-            background-color: #0B0F19;
+            background-color: #020617;
             color: #F3F4F6;
             font-family: 'Inter', sans-serif;
             -webkit-font-smoothing: antialiased;
         }
 
         ::-webkit-scrollbar {
-            display: none;
+            width: 0;
+            height: 0;
         }
 
         .glass-card {
-            background: rgba(20, 27, 45, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(59, 130, 246, 0.2);
+            background: rgba(20, 27, 45, 0.78);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(15, 23, 42, 0.8);
         }
 
         .active-nav-item {
@@ -208,16 +214,62 @@
             }
         }
 
-        /* Простая анимация появления экранов */
-        .screen-hidden {
-            display: none;
+        /* Screen visibility */
+        .screen-hidden { display: none; }
+        .screen-active { display: block; }
+
+        /* iPad layout */
+        @media (min-width: 768px) {
+            body {
+                background: radial-gradient(circle at top,
+                    rgba(30, 64, 175, 0.45),
+                    rgba(15, 23, 42, 1) 55%);
+            }
+
+            .ipad-shell {
+                border-radius: 1.75rem;
+                border: 1px solid rgba(15, 23, 42, 0.9);
+                box-shadow:
+                    0 25px 60px rgba(15, 23, 42, 0.9),
+                    0 0 0 10px rgba(15, 23, 42, 1);
+                padding: 0.75rem;
+                background: radial-gradient(circle at top left,
+                    rgba(37, 99, 235, 0.12),
+                    rgba(15, 23, 42, 1) 55%) #020617;
+            }
+
+            #app-container {
+                max-width: 768px;
+                border-radius: 1.5rem 1.5rem 0 0;
+                overflow: hidden;
+                border-left: 0;
+                border-right: 0;
+            }
+
+            #header {
+                border-radius: 1.5rem 1.5rem 0 0;
+            }
+
+            #main-content {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
+            }
+
+            #radarChart, #insights-chart {
+                height: 320px !important;
+            }
         }
-        .screen-active {
-            display: block;
+
+        @media (min-width: 1024px) {
+            .desktop-center {
+                max-width: 900px;
+                margin-left: auto;
+                margin-right: auto;
+            }
         }
     </style>
 </head>
-<body class="w-full min-h-screen relative overflow-x-hidden">
+<body class="w-full min-h-screen flex items-center justify-center">
 
 <!-- LuckyHunter Neon Loader (overlay) -->
 <div id="luckyhunter-loader" class="luckyhunter-loader-overlay" style="display: none;">
@@ -231,313 +283,347 @@
     </div>
 </div>
 
-<!-- Mobile Container Wrapper -->
-<div id="app-container" class="max-w-[375px] mx-auto bg-dark-900 min-h-screen pb-24 relative shadow-2xl border-x border-slate-800">
+<!-- Shell wrapper -->
+<div class="ipad-shell desktop-center w-full">
+    <!-- App container -->
+    <div id="app-container"
+         class="w-full max-w-[375px] md:max-w-[768px] mx-auto bg-dark-900 min-h-[640px] md:min-h-[720px] pb-24 relative shadow-2xl border-x border-slate-800 md:border-x-0">
 
-    <!-- Header -->
-    <header id="header" class="sticky top-0 z-50 glass-card px-5 py-4 flex justify-between items-center">
-        <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-neon">
-                <i class="fa-solid fa-heart-pulse text-white text-xs"></i>
-            </div>
-            <h1 class="text-lg font-bold tracking-tight text-white">
-                <span id="app-title-main">Date</span><span class="text-blue-500" id="app-title-sub">Log</span>
-            </h1>
-        </div>
-        <button id="notifications-btn" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/5 transition-colors relative">
-            <i class="fa-regular fa-bell text-gray-400"></i>
-            <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-        </button>
-    </header>
-
-    <!-- Main Content (Screens) -->
-    <main id="main-content" class="px-4 py-6 space-y-8">
-
-        <!-- HOME SCREEN -->
-        <section id="screen-home" class="screen-active space-y-8">
-            <!-- Hero / Insight Summary -->
-            <section id="hero-section">
-                <h2 class="text-2xl font-bold mb-1">Weekly Insight</h2>
-                <p class="text-gray-400 text-sm mb-4">Your dating mindfulness score is up 12%.</p>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-dark-800 border border-blue-500/30 rounded-xl p-4 flex flex-col justify-between h-32 relative overflow-hidden group">
-                        <div class="absolute -right-4 -top-4 w-16 h-16 bg-blue-500/10 rounded-full blur-xl group-hover:bg-blue-500/20 transition-all"></div>
-                        <i class="fa-solid fa-calendar-check text-blue-400 text-xl mb-2"></i>
-                        <div>
-                            <span class="text-3xl font-bold text-white" id="stats-dates-logged">12</span>
-                            <p class="text-xs text-gray-400 uppercase tracking-wider mt-1">Dates Logged</p>
-                        </div>
-                    </div>
-                    <div class="bg-dark-800 border border-blue-500/30 rounded-xl p-4 flex flex-col justify-between h-32 relative overflow-hidden group">
-                        <div class="absolute -right-4 -top-4 w-16 h-16 bg-purple-500/10 rounded-full blur-xl group-hover:bg-purple-500/20 transition-all"></div>
-                        <i class="fa-solid fa-star text-purple-400 text-xl mb-2"></i>
-                        <div>
-                            <span class="text-3xl font-bold text-white" id="stats-avg-quality">4.2</span>
-                            <p class="text-xs text-gray-400 uppercase tracking-wider mt-1">Avg Quality</p>
-                        </div>
-                    </div>
+        <!-- Header -->
+        <header id="header"
+                class="sticky top-0 z-50 glass-card px-5 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-neon">
+                    <i class="fa-solid fa-heart-pulse text-white text-xs"></i>
                 </div>
+                <h1 class="text-lg font-bold tracking-tight text-white">
+                    <span id="app-title-main">Date</span><span class="text-blue-500" id="app-title-sub">Log</span>
+                </h1>
+            </div>
+            <button id="notifications-btn"
+                    class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/5 transition-colors relative">
+                <i class="fa-regular fa-bell text-gray-400"></i>
+                <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+            </button>
+        </header>
+
+        <!-- Main Content -->
+        <main id="main-content" class="px-4 py-6 space-y-8">
+
+            <!-- HOME -->
+            <section id="screen-home" class="screen-active space-y-8">
+                <section id="hero-section">
+                    <h2 class="text-2xl font-bold mb-1">Weekly Insight</h2>
+                    <p class="text-gray-400 text-sm mb-4">Your dating mindfulness score is up 12%.</p>
+
+                    <div class="grid grid-cols-2 gap-3 md:gap-4">
+                        <div class="bg-dark-800 border border-blue-500/30 rounded-xl p-4 flex flex-col justify-between h-32 md:h-36 relative overflow-hidden group">
+                            <div class="absolute -right-4 -top-4 w-16 h-16 bg-blue-500/10 rounded-full blur-xl group-hover:bg-blue-500/20 transition-all"></div>
+                            <i class="fa-solid fa-calendar-check text-blue-400 text-xl mb-2"></i>
+                            <div>
+                                <span class="text-3xl font-bold text-white" id="stats-dates-logged">12</span>
+                                <p class="text-xs text-gray-400 uppercase tracking-wider mt-1">Dates Logged</p>
+                            </div>
+                        </div>
+                        <div class="bg-dark-800 border border-blue-500/30 rounded-xl p-4 flex flex-col justify-between h-32 md:h-36 relative overflow-hidden group">
+                            <div class="absolute -right-4 -top-4 w-16 h-16 bg-purple-500/10 rounded-full blur-xl group-hover:bg-purple-500/20 transition-all"></div>
+                            <i class="fa-solid fa-star text-purple-400 text-xl mb-2"></i>
+                            <div>
+                                <span class="text-3xl font-bold text-white" id="stats-avg-quality">4.2</span>
+                                <p class="text-xs text-gray-400 uppercase tracking-wider mt-1">Avg Quality</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="log-cta-section">
+                    <div id="log-cta-card"
+                         class="relative w-full h-48 md:h-56 rounded-2xl overflow-hidden border border-blue-500/50 shadow-neon group cursor-pointer">
+                        <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/60 to-transparent z-10"></div>
+                        <div class="absolute inset-0 z-0">
+                            <img src="https://images.unsplash.com/photo-1517457373958-b7bdd4587205?q=80&w=1000&auto=format&fit=crop"
+                                 class="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700"
+                                 alt="Restaurant ambience">
+                        </div>
+
+                        <div class="absolute bottom-0 left-0 w-full p-5 z-20">
+                            <div class="flex justify-between items-end">
+                                <div>
+                                    <h3 class="text-xl md:text-2xl font-bold text-white mb-1">Log Recent Date</h3>
+                                    <p class="text-gray-300 text-xs md:text-sm max-w-[260px]">
+                                        Reflect on your experience while it's fresh. How was the vibe?
+                                    </p>
+                                </div>
+                                <button id="log-cta-plus"
+                                        class="w-12 h-12 md:w-14 md:h-14 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-lg hover:bg-blue-500 transition-colors">
+                                    <i class="fa-solid fa-plus text-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="ai-model-section">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-white">Generated "Ideal" Model</h3>
+                        <span class="text-[10px] px-2 py-1 bg-blue-900/30 border border-blue-500/30 text-blue-400 rounded-full">
+                                AI Updated
+                            </span>
+                    </div>
+
+                    <div class="bg-dark-800 rounded-xl p-5 border border-slate-700 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-blue-600/5 rounded-full blur-3xl"></div>
+
+                        <div class="flex items-start gap-4 mb-4">
+                            <div class="w-14 h-14 rounded-full border-2 border-dashed border-blue-500/50 flex items-center justify-center bg-slate-800 shrink-0">
+                                <i class="fa-solid fa-wand-magic-sparkles text-blue-400"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-300 leading-relaxed" id="ai-model-text">
+                                    Based on your high-rated dates, you connect best with partners who are
+                                    <span class="text-white font-semibold">creative</span>, value
+                                    <span class="text-white font-semibold">deep conversation</span> over activities,
+                                    and prefer <span class="text-white font-semibold">quiet environments</span>.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div>
+                                <div class="flex justify-between text-xs text-gray-400 mb-1">
+                                    <span>Intellectual Connection</span>
+                                    <span id="ai-intellectual-label">85% Match Importance</span>
+                                </div>
+                                <div class="w-full bg-slate-700 rounded-full h-1.5">
+                                    <div id="ai-intellectual-bar"
+                                         class="bg-gradient-to-r from-blue-600 to-cyan-400 h-1.5 rounded-full"
+                                         style="width: 85%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-xs text-gray-400 mb-1">
+                                    <span>Shared Values</span>
+                                    <span id="ai-values-label">92% Match Importance</span>
+                                </div>
+                                <div class="w-full bg-slate-700 rounded-full h-1.5">
+                                    <div id="ai-values-bar"
+                                         class="bg-gradient-to-r from-blue-600 to-cyan-400 h-1.5 rounded-full"
+                                         style="width: 92%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="analytics-section">
+                    <h3 class="text-lg font-bold text-white mb-4">Experience Breakdown</h3>
+                    <div class="bg-dark-800 rounded-xl p-2 border border-slate-700 shadow-card">
+                        <div id="radarChart" class="w-full h-[300px]"></div>
+                    </div>
+                </section>
+
+                <section id="recent-logs-section">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-white">Recent Logs</h3>
+                        <button id="view-all-logs-btn"
+                                class="text-xs text-blue-400 hover:text-blue-300">
+                            View all
+                        </button>
+                    </div>
+
+                    <div id="recent-logs-container" class="space-y-3"></div>
+                </section>
             </section>
 
-            <!-- CTA: Log New Date -->
-            <section id="log-cta-section">
-                <div id="log-cta-card" class="relative w-full h-48 rounded-2xl overflow-hidden border border-blue-500/50 shadow-neon group cursor-pointer">
-                    <!-- Background Image with Overlay -->
-                    <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/60 to-transparent z-10"></div>
-                    <div class="absolute inset-0 z-0">
-                        <img src="https://images.unsplash.com/photo-1517457373958-b7bdd4587205?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" alt="Restaurant ambience">
+            <!-- INSIGHTS -->
+            <section id="screen-insights" class="screen-hidden space-y-6">
+                <section class="mt-1">
+                    <h2 class="text-2xl font-bold mb-1">Insights</h2>
+                    <p class="text-gray-400 text-sm mb-4">Patterns from your recent dates.</p>
+                </section>
+
+                <section class="bg-dark-800 rounded-xl p-4 border border-slate-700 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-sm font-semibold text-white">Emotional Trend</h3>
+                        <span class="text-[10px] px-2 py-1 bg-slate-800 rounded-full text-gray-400">Last 6 dates</span>
+                    </div>
+                    <div id="insights-chart" class="w-full h-40 md:h-56"></div>
+                </section>
+
+                <section class="bg-dark-800 rounded-xl p-4 border border-slate-700 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-sm font-semibold text-white">Quick AI Notes</h3>
+                    </div>
+                    <ul class="text-xs text-gray-300 space-y-2 list-disc list-inside">
+                        <li>You rate conversation higher than activity 70% of the time.</li>
+                        <li>Outdoor dates tend to score 0.8 higher than indoor ones.</li>
+                        <li>Shorter dates (under 2h) correlate with better follow-ups.</li>
+                    </ul>
+                </section>
+            </section>
+
+            <!-- JOURNAL -->
+            <section id="screen-journal" class="screen-hidden space-y-6">
+                <section class="mt-1">
+                    <h2 class="text-2xl font-bold mb-1">Journal</h2>
+                    <p class="text-gray-400 text-sm mb-4">Free-form reflections about your connections.</p>
+                </section>
+
+                <section class="bg-dark-800 rounded-xl p-4 border border-slate-700 space-y-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="text-sm font-semibold text-white">New Entry</h3>
+                        <span class="text-[10px] text-gray-500" id="journal-date-label"></span>
+                    </div>
+                    <textarea id="journal-textarea"
+                              class="w-full bg-dark-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none h-32 md:h-40"
+                              placeholder="How are you feeling about dating right now?"></textarea>
+                    <button id="journal-save-btn"
+                            class="w-full h-10 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-floppy-disk text-xs"></i>
+                        Save Entry
+                    </button>
+                    <p id="journal-status" class="text-[11px] text-green-400 mt-1 hidden">Saved ✓</p>
+                </section>
+
+                <section class="bg-dark-800 rounded-xl p-4 border border-slate-700 space-y-3">
+                    <h3 class="text-sm font-semibold text-white">Last Entry</h3>
+                    <p id="journal-last-entry" class="text-xs text-gray-300 italic">No entries yet.</p>
+                </section>
+            </section>
+
+            <!-- PROFILE -->
+            <section id="screen-profile" class="screen-hidden space-y-6">
+                <section class="mt-1">
+                    <h2 class="text-2xl font-bold mb-1">Profile</h2>
+                    <p class="text-gray-400 text-sm mb-4">Your preferences & settings.</p>
+                </section>
+
+                <section class="bg-dark-800 rounded-xl p-4 border border-slate-700 space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-neon">
+                            <i class="fa-solid fa-user text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-semibold text-white" id="profile-name">You</h3>
+                            <p class="text-xs text-gray-400">Mindful dater</p>
+                        </div>
                     </div>
 
-                    <div class="absolute bottom-0 left-0 w-full p-5 z-20">
-                        <div class="flex justify-between items-end">
-                            <div>
-                                <h3 class="text-xl font-bold text-white mb-1">Log Recent Date</h3>
-                                <p class="text-gray-300 text-xs max-w-[200px]">Reflect on your experience while it's fresh. How was the vibe?</p>
-                            </div>
-                            <button id="log-cta-plus" class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-lg hover:bg-blue-500 transition-colors">
-                                <i class="fa-solid fa-plus text-lg"></i>
+                    <div class="border-t border-slate-700 pt-4 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-gray-300">Notifications</span>
+                            <button id="toggle-notifications"
+                                    class="w-10 h-5 rounded-full bg-slate-700 relative transition-colors">
+                                    <span id="toggle-notifications-dot"
+                                          class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform"></span>
+                            </button>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-gray-300">Show LuckyHunter Loader</span>
+                            <button id="toggle-loader-demo"
+                                    class="px-2 py-1 rounded-full border border-blue-500/40 text-[11px] text-blue-400 hover:bg-blue-500/10">
+                                Demo
                             </button>
                         </div>
                     </div>
-                </div>
+                </section>
             </section>
 
-            <!-- AI Model: Ideal Partner -->
-            <section id="ai-model-section">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-bold text-white">Generated "Ideal" Model</h3>
-                    <span class="text-[10px] px-2 py-1 bg-blue-900/30 border border-blue-500/30 text-blue-400 rounded-full">AI Updated</span>
-                </div>
-
-                <div class="bg-dark-800 rounded-xl p-5 border border-slate-700 relative overflow-hidden">
-                    <!-- Decorative glow -->
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-blue-600/5 rounded-full blur-3xl"></div>
-
-                    <div class="flex items-start gap-4 mb-4">
-                        <div class="w-14 h-14 rounded-full border-2 border-dashed border-blue-500/50 flex items-center justify-center bg-slate-800 shrink-0">
-                            <i class="fa-solid fa-wand-magic-sparkles text-blue-400"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-300 leading-relaxed" id="ai-model-text">
-                                Based on your high-rated dates, you connect best with partners who are <span class="text-white font-semibold">creative</span>, value <span class="text-white font-semibold">deep conversation</span> over activities, and prefer <span class="text-white font-semibold">quiet environments</span>.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="space-y-3">
-                        <div>
-                            <div class="flex justify-between text-xs text-gray-400 mb-1">
-                                <span>Intellectual Connection</span>
-                                <span id="ai-intellectual-label">85% Match Importance</span>
-                            </div>
-                            <div class="w-full bg-slate-700 rounded-full h-1.5">
-                                <div id="ai-intellectual-bar" class="bg-gradient-to-r from-blue-600 to-cyan-400 h-1.5 rounded-full" style="width: 85%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-xs text-gray-400 mb-1">
-                                <span>Shared Values</span>
-                                <span id="ai-values-label">92% Match Importance</span>
-                            </div>
-                            <div class="w-full bg-slate-700 rounded-full h-1.5">
-                                <div id="ai-values-bar" class="bg-gradient-to-r from-blue-600 to-cyan-400 h-1.5 rounded-full" style="width: 92%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Analytics Chart -->
-            <section id="analytics-section">
-                <h3 class="text-lg font-bold text-white mb-4">Experience Breakdown</h3>
-                <div class="bg-dark-800 rounded-xl p-2 border border-slate-700 shadow-card">
-                    <div id="radarChart" class="w-full h-[300px]"></div>
-                </div>
-            </section>
-
-            <!-- Recent Logs Feed -->
-            <section id="recent-logs-section">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-bold text-white">Recent Logs</h3>
-                    <button id="view-all-logs-btn" class="text-xs text-blue-400 hover:text-blue-300">View all</button>
-                </div>
-
-                <div id="recent-logs-container" class="space-y-3">
-                    <!-- Logs will be rendered from JS; initial template preserved below as reference in JS -->
-                </div>
-            </section>
-        </section>
-
-        <!-- INSIGHTS SCREEN -->
-        <section id="screen-insights" class="screen-hidden space-y-6">
-            <section class="mt-1">
-                <h2 class="text-2xl font-bold mb-1">Insights</h2>
-                <p class="text-gray-400 text-sm mb-4">Patterns from your recent dates.</p>
-            </section>
-
-            <section class="bg-dark-800 rounded-xl p-4 border border-slate-700 space-y-4">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-sm font-semibold text-white">Emotional Trend</h3>
-                    <span class="text-[10px] px-2 py-1 bg-slate-800 rounded-full text-gray-400">Last 6 dates</span>
-                </div>
-                <div id="insights-chart" class="w-full h-40"></div>
-            </section>
-
-            <section class="bg-dark-800 rounded-xl p-4 border border-slate-700 space-y-4">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-sm font-semibold text-white">Quick AI Notes</h3>
-                </div>
-                <ul class="text-xs text-gray-300 space-y-2 list-disc list-inside">
-                    <li>You rate conversation higher than activity 70% of the time.</li>
-                    <li>Outdoor dates tend to score 0.8 higher than indoor ones.</li>
-                    <li>Shorter dates (under 2h) correlate with better follow-ups.</li>
-                </ul>
-            </section>
-        </section>
-
-        <!-- JOURNAL SCREEN -->
-        <section id="screen-journal" class="screen-hidden space-y-6">
-            <section class="mt-1">
-                <h2 class="text-2xl font-bold mb-1">Journal</h2>
-                <p class="text-gray-400 text-sm mb-4">Free-form reflections about your connections.</p>
-            </section>
-
-            <section class="bg-dark-800 rounded-xl p-4 border border-slate-700 space-y-4">
-                <div class="flex justify-between items-center mb-2">
-                    <h3 class="text-sm font-semibold text-white">New Entry</h3>
-                    <span class="text-[10px] text-gray-500" id="journal-date-label"></span>
-                </div>
-                <textarea id="journal-textarea" class="w-full bg-dark-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none h-32" placeholder="How are you feeling about dating right now?"></textarea>
-                <button id="journal-save-btn" class="w-full h-10 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-floppy-disk text-xs"></i>
-                    Save Entry
-                </button>
-                <p id="journal-status" class="text-[11px] text-green-400 mt-1 hidden">Saved ✓</p>
-            </section>
-
-            <section class="bg-dark-800 rounded-xl p-4 border border-slate-700 space-y-3">
-                <h3 class="text-sm font-semibold text-white">Last Entry</h3>
-                <p id="journal-last-entry" class="text-xs text-gray-300 italic">No entries yet.</p>
-            </section>
-        </section>
-
-        <!-- PROFILE SCREEN -->
-        <section id="screen-profile" class="screen-hidden space-y-6">
-            <section class="mt-1">
-                <h2 class="text-2xl font-bold mb-1">Profile</h2>
-                <p class="text-gray-400 text-sm mb-4">Your preferences & settings.</p>
-            </section>
-
-            <section class="bg-dark-800 rounded-xl p-4 border border-slate-700 space-y-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-neon">
-                        <i class="fa-solid fa-user text-white"></i>
-                    </div>
+            <!-- LOG FORM -->
+            <section id="screen-log-form" class="screen-hidden space-y-4">
+                <section class="flex items-center gap-3 mt-1">
+                    <button id="log-form-back"
+                            class="w-8 h-8 rounded-full bg-dark-800 flex items-center justify-center text-gray-300 hover:bg-dark-700">
+                        <i class="fa-solid fa-chevron-left text-xs"></i>
+                    </button>
                     <div>
-                        <h3 class="text-sm font-semibold text-white" id="profile-name">You</h3>
-                        <p class="text-xs text-gray-400">Mindful dater</p>
+                        <h2 class="text-xl font-bold text-white">Log Date</h2>
+                        <p class="text-gray-400 text-xs" id="log-form-date-label"></p>
                     </div>
-                </div>
+                </section>
 
-                <div class="border-t border-slate-700 pt-4 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs text-gray-300">Notifications</span>
-                        <button id="toggle-notifications" class="w-10 h-5 rounded-full bg-slate-700 relative transition-colors">
-                            <span id="toggle-notifications-dot" class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform"></span>
-                        </button>
+                <section class="bg-dark-800 rounded-xl p-4 border border-slate-700 space-y-4">
+                    <div class="space-y-1">
+                        <label class="text-xs text-gray-300">Partner name</label>
+                        <input id="log-name" type="text"
+                               class="w-full bg-dark-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                               placeholder="e.g. Sarah">
                     </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs text-gray-300">Show LuckyHunter Loader</span>
-                        <button id="toggle-loader-demo" class="px-2 py-1 rounded-full border border-blue-500/40 text-[11px] text-blue-400 hover:bg-blue-500/10">
-                            Demo
-                        </button>
+
+                    <div class="space-y-1">
+                        <label class="text-xs text-gray-300">Location</label>
+                        <input id="log-location" type="text"
+                               class="w-full bg-dark-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                               placeholder="e.g. Blue Bottle Coffee">
                     </div>
-                </div>
+
+                    <div class="space-y-1">
+                        <label class="text-xs text-gray-300 flex justify-between">
+                            <span>Rating</span>
+                            <span id="log-rating-label" class="text-blue-400">3.0</span>
+                        </label>
+                        <input id="log-rating" type="range" min="1" max="5" step="0.1" value="3" class="w-full">
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-xs text-gray-300">Notes</label>
+                        <textarea id="log-notes"
+                                  class="w-full bg-dark-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none h-24 md:h-32"
+                                  placeholder="How did it feel? Any red or green flags?"></textarea>
+                    </div>
+
+                    <button id="log-save-btn"
+                            class="w-full h-10 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-check text-xs"></i>
+                        Save log
+                    </button>
+                    <p id="log-save-status" class="text-[11px] text-green-400 mt-1 hidden">Saved ✓</p>
+                </section>
             </section>
-        </section>
 
-        <!-- LOG FORM SCREEN (MODAL-LIKE, FULL WIDTH) -->
-        <section id="screen-log-form" class="screen-hidden space-y-4">
-            <section class="flex items-center gap-3 mt-1">
-                <button id="log-form-back" class="w-8 h-8 rounded-full bg-dark-800 flex items-center justify-center text-gray-300 hover:bg-dark-700">
-                    <i class="fa-solid fa-chevron-left text-xs"></i>
-                </button>
-                <div>
-                    <h2 class="text-xl font-bold text-white">Log Date</h2>
-                    <p class="text-gray-400 text-xs" id="log-form-date-label"></p>
-                </div>
-            </section>
+        </main>
 
-            <section class="bg-dark-800 rounded-xl p-4 border border-slate-700 space-y-4">
-                <div class="space-y-1">
-                    <label class="text-xs text-gray-300">Partner name</label>
-                    <input id="log-name" type="text" class="w-full bg-dark-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="e.g. Sarah">
-                </div>
+    </div>
+</div>
 
-                <div class="space-y-1">
-                    <label class="text-xs text-gray-300">Location</label>
-                    <input id="log-location" type="text" class="w-full bg-dark-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="e.g. Blue Bottle Coffee">
-                </div>
+<!-- Bottom Navigation: ВДОЛЬ ВСЕГО ЭКРАНА -->
+<nav id="bottom-nav"
+     class="fixed bottom-0 left-0 right-0 z-50 bg-[#0f1523] border-t border-slate-800 pb-safe">
+    <!-- Внутри центрируем по макету, но фон тянется на 100% ширины -->
+    <div class="w-full max-w-[375px] md:max-w-[768px] mx-auto flex justify-around items-center h-16 px-2">
+        <button data-screen="home"
+                class="nav-item flex flex-col items-center justify-center w-16 h-full space-y-1 active-nav-item">
+            <i class="fa-solid fa-house text-lg"></i>
+            <span class="text-[10px] font-medium">Home</span>
+        </button>
+        <button data-screen="insights"
+                class="nav-item flex flex-col items-center justify-center w-16 h-full space-y-1 text-gray-500 hover:text-gray-300">
+            <i class="fa-solid fa-chart-pie text-lg"></i>
+            <span class="text-[10px] font-medium">Insights</span>
+        </button>
 
-                <div class="space-y-1">
-                    <label class="text-xs text-gray-300 flex justify-between">
-                        <span>Rating</span>
-                        <span id="log-rating-label" class="text-blue-400">3.0</span>
-                    </label>
-                    <input id="log-rating" type="range" min="1" max="5" step="0.1" value="3" class="w-full">
-                </div>
-
-                <div class="space-y-1">
-                    <label class="text-xs text-gray-300">Notes</label>
-                    <textarea id="log-notes" class="w-full bg-dark-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none h-24" placeholder="How did it feel? Any red or green flags?"></textarea>
-                </div>
-
-                <button id="log-save-btn" class="w-full h-10 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-check text-xs"></i>
-                    Save log
-                </button>
-                <p id="log-save-status" class="text-[11px] text-green-400 mt-1 hidden">Saved ✓</p>
-            </section>
-        </section>
-
-    </main>
-
-    <!-- Bottom Navigation -->
-    <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 z-50 bg-[#0f1523] border-t border-slate-800 pb-safe max-w-[375px] mx-auto">
-        <div class="flex justify-around items-center h-16 px-2">
-            <button data-screen="home" class="nav-item flex flex-col items-center justify-center w-16 h-full space-y-1 active-nav-item">
-                <i class="fa-solid fa-house text-lg"></i>
-                <span class="text-[10px] font-medium">Home</span>
-            </button>
-            <button data-screen="insights" class="nav-item flex flex-col items-center justify-center w-16 h-full space-y-1 text-gray-500 hover:text-gray-300">
-                <i class="fa-solid fa-chart-pie text-lg"></i>
-                <span class="text-[10px] font-medium">Insights</span>
-            </button>
-
-            <!-- Floating Center Button -->
-            <div class="relative -top-5">
-                <button id="center-log-btn" class="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-neon border-4 border-dark-900">
-                    <i class="fa-solid fa-pen-fancy text-xl"></i>
-                </button>
-            </div>
-
-            <button data-screen="journal" class="nav-item flex flex-col items-center justify-center w-16 h-full space-y-1 text-gray-500 hover:text-gray-300">
-                <i class="fa-solid fa-book-open text-lg"></i>
-                <span class="text-[10px] font-medium">Journal</span>
-            </button>
-            <button data-screen="profile" class="nav-item flex flex-col items-center justify-center w-16 h-full space-y-1 text-gray-500 hover:text-gray-300">
-                <i class="fa-solid fa-user text-lg"></i>
-                <span class="text-[10px] font-medium">Profile</span>
+        <div class="relative -top-5">
+            <button id="center-log-btn"
+                    class="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-neon border-4 border-dark-900">
+                <i class="fa-solid fa-pen-fancy text-xl"></i>
             </button>
         </div>
-    </nav>
 
-</div>
+        <button data-screen="journal"
+                class="nav-item flex flex-col items-center justify-center w-16 h-full space-y-1 text-gray-500 hover:text-gray-300">
+            <i class="fa-solid fa-book-open text-lg"></i>
+            <span class="text-[10px] font-medium">Journal</span>
+        </button>
+        <button data-screen="profile"
+                class="nav-item flex flex-col items-center justify-center w-16 h-full space-y-1 text-gray-500 hover:text-gray-300">
+            <i class="fa-solid fa-user text-lg"></i>
+            <span class="text-[10px] font-medium">Profile</span>
+        </button>
+    </div>
+</nav>
 
 <!-- App Logic -->
 <script>
-    // ---- SIMPLE IN-MEMORY STATE (можешь заменить на localStorage, если нужно) ----
     const appState = {
         currentScreen: 'home',
         notificationsEnabled: true,
@@ -591,7 +677,6 @@
         if (label) label.textContent = formatToday();
     }
 
-    // ----- SCREENS -----
     function setActiveScreen(name) {
         appState.currentScreen = name;
 
@@ -608,12 +693,9 @@
             }
         });
 
-        // nav active state
         document.querySelectorAll('.nav-item').forEach(btn => {
             btn.classList.remove('active-nav-item');
             btn.classList.add('text-gray-500');
-            const icon = btn.querySelector('i');
-            if (icon) icon.classList.remove('text-blue-500');
         });
 
         const activeNav = document.querySelector('.nav-item[data-screen="' + name + '"]');
@@ -622,7 +704,6 @@
             activeNav.classList.remove('text-gray-500');
         }
 
-        // меняем заголовок, но дизайн не ломаем
         const appTitleMain = document.getElementById('app-title-main');
         const appTitleSub = document.getElementById('app-title-sub');
         if (appTitleMain && appTitleSub) {
@@ -652,7 +733,6 @@
         }
     }
 
-    // ----- RECENT LOGS RENDER -----
     function ratingColor(r) {
         if (r >= 4) return 'text-green-400';
         if (r >= 3) return 'text-yellow-400';
@@ -672,7 +752,8 @@
 
         appState.logs.slice(0, 5).forEach(log => {
             const div = document.createElement('div');
-            div.className = `bg-dark-800 rounded-lg p-4 border-l-4 ${borderColor(log.rating)} border-y border-r border-y-slate-700 border-r-slate-700 flex gap-4 items-center hover:bg-slate-800/80 transition-colors cursor-pointer`;
+            div.className =
+                `bg-dark-800 rounded-lg p-4 border-l-4 ${borderColor(log.rating)} border-y border-r border-y-slate-700 border-r-slate-700 flex gap-4 items-center hover:bg-slate-800/80 transition-colors cursor-pointer`;
             div.innerHTML = `
                 <img src="${log.avatar}" alt="${log.name}" class="w-12 h-12 rounded-full object-cover border-2 border-dark-900">
                 <div class="flex-1">
@@ -681,7 +762,9 @@
                         <span class="text-[10px] text-gray-500">${log.dateLabel}</span>
                     </div>
                     <div class="flex items-center gap-2 mt-1">
-                        <span class="text-xs text-gray-400"><i class="fa-solid fa-location-dot mr-1 text-blue-500"></i>${log.location}</span>
+                        <span class="text-xs text-gray-400">
+                            <i class="fa-solid fa-location-dot mr-1 text-blue-500"></i>${log.location}
+                        </span>
                     </div>
                 </div>
                 <div class="flex flex-col items-center justify-center bg-slate-900/50 p-2 rounded-lg min-w-[50px]">
@@ -697,7 +780,6 @@
         });
     }
 
-    // ----- INSIGHTS CHART (simple Plotly line) -----
     function renderInsightsChart() {
         const el = document.getElementById('insights-chart');
         if (!el) return;
@@ -737,7 +819,6 @@
         }
     }
 
-    // ----- LUCKYHUNTER LOADER -----
     function showLuckyLoader(ms = 1200, cb) {
         const loader = document.getElementById('luckyhunter-loader');
         if (!loader) {
@@ -757,9 +838,7 @@
         }, ms);
     }
 
-    // ----- MAIN INIT -----
-    window.addEventListener('load', function() {
-        // Show loader on first load (webview style)
+    window.addEventListener('load', function () {
         showLuckyLoader(900);
 
         // Radar Chart
@@ -809,12 +888,10 @@
             console.error("Chart loading failed", e);
         }
 
-        // Render recent logs
         renderRecentLogs();
         updateJournalMeta();
         updateLogFormMeta();
 
-        // NAV buttons
         document.querySelectorAll('.nav-item').forEach(btn => {
             btn.addEventListener('click', () => {
                 const screen = btn.getAttribute('data-screen');
@@ -823,18 +900,18 @@
             });
         });
 
-        // Center FAB -> log form
-        document.getElementById('center-log-btn').addEventListener('click', () => {
-            updateLogFormMeta();
-            setActiveScreen('log-form');
-        });
+        const centerLogBtn = document.getElementById('center-log-btn');
+        if (centerLogBtn) {
+            centerLogBtn.addEventListener('click', () => {
+                updateLogFormMeta();
+                setActiveScreen('log-form');
+            });
+        }
 
-        // CTA card and plus -> log form
         const ctaCard = document.getElementById('log-cta-card');
         const ctaPlus = document.getElementById('log-cta-plus');
         if (ctaCard) {
             ctaCard.addEventListener('click', (e) => {
-                // не ловим двойной клик, если именно по кнопке
                 if (e.target.closest('button')) return;
                 updateLogFormMeta();
                 setActiveScreen('log-form');
@@ -848,15 +925,11 @@
             });
         }
 
-        // Back from log-form -> home
         const backBtn = document.getElementById('log-form-back');
         if (backBtn) {
-            backBtn.addEventListener('click', () => {
-                setActiveScreen('home');
-            });
+            backBtn.addEventListener('click', () => setActiveScreen('home'));
         }
 
-        // Rating range label
         const ratingInput = document.getElementById('log-rating');
         const ratingLabel = document.getElementById('log-rating-label');
         if (ratingInput && ratingLabel) {
@@ -865,7 +938,6 @@
             });
         }
 
-        // Save log
         const saveLogBtn = document.getElementById('log-save-btn');
         const logStatus = document.getElementById('log-save-status');
         if (saveLogBtn && logStatus) {
@@ -886,7 +958,6 @@
                 };
                 appState.logs.unshift(newLog);
 
-                // обновляем чиселки
                 document.getElementById('stats-dates-logged').textContent = appState.logs.length;
                 const avg = appState.logs.reduce((s, l) => s + l.rating, 0) / appState.logs.length;
                 document.getElementById('stats-avg-quality').textContent = avg.toFixed(1);
@@ -896,19 +967,16 @@
                 logStatus.classList.remove('hidden');
                 setTimeout(() => logStatus.classList.add('hidden'), 1200);
 
-                // сброс формы
                 document.getElementById('log-name').value = '';
                 document.getElementById('log-location').value = '';
                 document.getElementById('log-notes').value = '';
                 ratingInput.value = '3';
                 ratingLabel.textContent = '3.0';
 
-                // назад на home
                 setActiveScreen('home');
             });
         }
 
-        // Journal save
         const journalSaveBtn = document.getElementById('journal-save-btn');
         const journalStatus = document.getElementById('journal-status');
         const journalTextarea = document.getElementById('journal-textarea');
@@ -927,15 +995,11 @@
             });
         }
 
-        // View all logs -> insights screen + slight scroll
         const viewAllLogsBtn = document.getElementById('view-all-logs-btn');
         if (viewAllLogsBtn) {
-            viewAllLogsBtn.addEventListener('click', () => {
-                setActiveScreen('insights');
-            });
+            viewAllLogsBtn.addEventListener('click', () => setActiveScreen('insights'));
         }
 
-        // Notifications toggle (UI only)
         const notifToggle = document.getElementById('toggle-notifications');
         const notifDot = document.getElementById('toggle-notifications-dot');
         if (notifToggle && notifDot) {
@@ -957,28 +1021,21 @@
             });
         }
 
-        // Demo LuckyHunter loader from Profile
         const loaderDemoBtn = document.getElementById('toggle-loader-demo');
         if (loaderDemoBtn) {
-            loaderDemoBtn.addEventListener('click', () => {
-                showLuckyLoader(900);
-            });
+            loaderDemoBtn.addEventListener('click', () => showLuckyLoader(900));
         }
 
-        // Notifications bell click
         const notifBtn = document.getElementById('notifications-btn');
         if (notifBtn) {
             notifBtn.addEventListener('click', () => {
-                // Простое действие без перехода: подсветим, что "нет новых уведомлений"
                 alert('No new notifications yet. Stay mindful ✨');
             });
         }
     });
-</script>
 
-<!-- Minimal blocking of real navigation (но не ломаем наши кнопки, т.к. они button, не a) -->
-<script>
-    (function() {
+    // Anti-navigation
+    (function () {
         function blockEvent(e) {
             if (!e) return false;
             if (typeof e.preventDefault === 'function') e.preventDefault();
@@ -987,29 +1044,28 @@
             return false;
         }
 
-        // Block all anchor navigations
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
             if (!a) return;
             return blockEvent(e);
         }, true);
 
-        // Block form submissions
-        document.addEventListener('submit', function(e) {
+        document.addEventListener('submit', function (e) {
             return blockEvent(e);
         }, true);
 
-        // Neutralize programmatic navigation attempts
-        try { window.open = function() { return null }; } catch (_) {}
         try {
-            var noop = function(){};
+            window.open = function () { return null; };
+        } catch (_) {}
+        try {
+            var noop = function () {};
             history.pushState = noop;
             history.replaceState = noop;
         } catch (_) {}
         try {
             if (window.location) {
-                window.location.assign = function(){};
-                window.location.replace = function(){};
+                window.location.assign = function () {};
+                window.location.replace = function () {};
             }
         } catch (_) {}
     })();

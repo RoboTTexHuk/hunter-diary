@@ -40,15 +40,7 @@ class _LuckyHunterHelpLiteState extends State<LuckyHunterHelpLite> {
         appBar: AppBar(
           backgroundColor: Colors.black,
           elevation: 0,
-          leading: IconButton(
-            tooltip: 'Назад',
-            icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-            onPressed: () async {
-              final bool luckyHunterHandled =
-              await luckyHunterGoBackInWebViewIfPossible();
-              if (!luckyHunterHandled) {}
-            },
-          ),
+
         ),
         body: SafeArea(
           child: Stack(
@@ -275,7 +267,7 @@ class LuckyHunterNeonPainter extends CustomPainter {
 
     final TextPainter luckyHunterBottomTextPainter = TextPainter(
       text: TextSpan(
-        text: 'Lucky',
+        text: 'Diary',
         style: luckyHunterBaseStyle.copyWith(
           fontSize: 50,
           foreground: Paint()
