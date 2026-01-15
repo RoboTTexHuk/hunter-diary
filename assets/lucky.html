@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DateLog - Relationship Mindfulness</title>
+
+    <!-- Tailwind & Plotly -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
+    <script>
+        window.FontAwesomeConfig = { autoReplaceSvg: 'nest' };
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            900: '#0B0F19',
+                            800: '#141B2D',
+                            700: '#1E293B',
+                        },
+                        brand: {
+                            blue: '#3B82F6',
+                            glow: 'rgba(59, 130, 246, 0.5)'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'neon': '0 0 15px rgba(59, 130, 246, 0.3)',
+                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.5)',
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <style>
+        body {
+            background-color: #0B0F19;
+            color: #F3F4F6;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        .glass-card {
+            background: rgba(20, 27, 45, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .active-nav-item {
+            color: #3B82F6;
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+        }
+
+        /* LuckyHunter Neon Loader */
+        .luckyhunter-loader-overlay {
+            position: fixed;
+            inset: 0;
+            background: #000000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            pointer-events: auto;
+        }
+
+        .luckyhunter-loader-inner {
+            position: relative;
+            width: 100%;
+            max-width: 375px;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .luckyhunter-glow-circle {
+            position: absolute;
+            width: 150vmin;
+            height: 150vmin;
+            border-radius: 9999px;
+            background: radial-gradient(circle at center,
+                rgba(147, 51, 234, 0.15),
+                rgba(88, 28, 135, 0.4),
+                transparent 65%);
+            filter: blur(8px);
+            opacity: 0.85;
+        }
+
+        .luckyhunter-word {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-weight: 900;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            color: #ffffff;
+            text-shadow:
+                0 0 8px rgba(168, 85, 247, 0.9),
+                0 0 18px rgba(129, 140, 248, 0.8),
+                0 0 32px rgba(129, 140, 248, 0.7);
+            white-space: nowrap;
+        }
+
+        .luckyhunter-word-top {
+            font-size: 1.7rem;
+            background: linear-gradient(135deg, #a855f7, #e5e7eb, #6366f1);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: luckyhunter-top-move 2s ease-in-out infinite alternate;
+        }
+
+        .luckyhunter-word-bottom {
+            font-size: 2.1rem;
+            background: linear-gradient(225deg, #e5e7eb, #a855f7, #e5e7eb);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: luckyhunter-bottom-move 2s ease-in-out infinite alternate;
+        }
+
+        .luckyhunter-soft-glow {
+            position: absolute;
+            width: 260px;
+            height: 260px;
+            border-radius: 9999px;
+            background: radial-gradient(circle at center,
+                rgba(196, 181, 253, 0.18),
+                rgba(30, 64, 175, 0.0) 70%);
+            opacity: 0.9;
+            filter: blur(4px);
+        }
+
+        @keyframes luckyhunter-top-move {
+            0% {
+                top: calc(50% - 180px);
+                opacity: 0.4;
+                text-shadow:
+                    0 0 4px rgba(168, 85, 247, 0.7),
+                    0 0 12px rgba(129, 140, 248, 0.7);
+            }
+            100% {
+                top: calc(50% - 52px);
+                opacity: 1;
+                text-shadow:
+                    0 0 8px rgba(168, 85, 247, 0.9),
+                    0 0 22px rgba(129, 140, 248, 0.9),
+                    0 0 36px rgba(129, 140, 248, 0.9);
+            }
+        }
+
+        @keyframes luckyhunter-bottom-move {
+            0% {
+                top: calc(50% + 180px);
+                opacity: 0.4;
+                text-shadow:
+                    0 0 4px rgba(168, 85, 247, 0.7),
+                    0 0 12px rgba(129, 140, 248, 0.7);
+            }
+            100% {
+                top: calc(50% + 52px);
+                opacity: 1;
+                text-shadow:
+                    0 0 8px rgba(168, 85, 247, 0.9),
+                    0 0 22px rgba(129, 140, 248, 0.9),
+                    0 0 36px rgba(129, 140, 248, 0.9);
+            }
+        }
+
+        .luckyhunter-pulse-ring {
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            border-radius: 9999px;
+            border: 1px solid rgba(129, 140, 248, 0.4);
+            box-shadow:
+                0 0 20px rgba(129, 140, 248, 0.5),
+                inset 0 0 20px rgba(129, 140, 248, 0.2);
+            animation: luckyhunter-pulse 2.4s ease-out infinite;
+        }
+
+        @keyframes luckyhunter-pulse {
+            0% {
+                transform: scale(0.92);
+                opacity: 0.8;
+            }
+            50% {
+                transform: scale(1.04);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.14);
+                opacity: 0.2;
+            }
+        }
+
+        /* Простая анимация появления экранов */
+        .screen-hidden {
+            display: none;
+        }
+        .screen-active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="w-full min-h-screen relative overflow-x-hidden">
+
+<!-- LuckyHunter Neon Loader (overlay) -->
+<div id="luckyhunter-loader" class="luckyhunter-loader-overlay" style="display: none;">
+    <div class="luckyhunter-loader-inner">
+        <div class="luckyhunter-glow-circle"></div>
+        <div class="luckyhunter-soft-glow"></div>
+        <div class="luckyhunter-pulse-ring"></div>
+
+        <div class="luckyhunter-word luckyhunter-word-top">HUNTER</div>
+        <div class="luckyhunter-word luckyhunter-word-bottom">LUCKY</div>
+    </div>
+</div>
+
+<!-- Mobile Container Wrapper -->
+<div id="app-container" class="max-w-[375px] mx-auto bg-dark-900 min-h-screen pb-24 relative shadow-2xl border-x border-slate-800">
+
+    <!-- Header -->
+    <header id="header" class="sticky top-0 z-50 glass-card px-5 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-neon">
+                <i class="fa-solid fa-heart-pulse text-white text-xs"></i>
+            </div>
+            <h1 class="text-lg font-bold tracking-tight text-white">
+                <span id="app-title-main">Date</span><span class="text-blue-500" id="app-title-sub">Log</span>
+            </h1>
+        </div>
+        <button id="notifications-btn" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/5 transition-colors relative">
+            <i class="fa-regular fa-bell text-gray-400"></i>
+            <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+        </button>
+    </header>
+
+    <!-- Main Content (Screens) -->
+    <main id="main-content" class="px-4 py-6 space-y-8">
+
+        <!-- HOME SCREEN -->
+        <section id="screen-home" class="screen-active space-y-8">
+            <!-- Hero / Insight Summary -->
+            <section id="hero-section">
+                <h2 class="text-2xl font-bold mb-1">Weekly Insight</h2>
+                <p class="text-gray-400 text-sm mb-4">Your dating mindfulness score is up 12%.</p>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-dark-800 border border-blue-500/30 rounded-xl p-4 flex flex-col justify-between h-32 relative overflow-hidden group">
+                        <div class="absolute -right-4 -top-4 w-16 h-16 bg-blue-500/10 rounded-full blur-xl group-hover:bg-blue-500/20 transition-all"></div>
+                        <i class="fa-solid fa-calendar-check text-blue-400 text-xl mb-2"></i>
+                        <div>
+                            <span class="text-3xl font-bold text-white" id="stats-dates-logged">12</span>
+                            <p class="text-xs text-gray-400 uppercase tracking-wider mt-1">Dates Logged</p>
+                        </div>
+                    </div>
+                    <div class="bg-dark-800 border border-blue-500/30 rounded-xl p-4 flex flex-col justify-between h-32 relative overflow-hidden group">
+                        <div class="absolute -right-4 -top-4 w-16 h-16 bg-purple-500/10 rounded-full blur-xl group-hover:bg-purple-500/20 transition-all"></div>
+                        <i class="fa-solid fa-star text-purple-400 text-xl mb-2"></i>
+                        <div>
+                            <span class="text-3xl font-bold text-white" id="stats-avg-quality">4.2</span>
+                            <p class="text-xs text-gray-400 uppercase tracking-wider mt-1">Avg Quality</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CTA: Log New Date -->
+            <section id="log-cta-section">
+                <div id="log-cta-card" class="relative w-full h-48 rounded-2xl overflow-hidden border border-blue-500/50 shadow-neon group cursor-pointer">
+                    <!-- Background Image with Overlay -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/60 to-transparent z-10"></div>
+                    <div class="absolute inset-0 z-0">
+                        <img src="https://images.unsplash.com/photo-1517457373958-b7bdd4587205?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" alt="Restaurant ambience">
+                    </div>
+
+                    <div class="absolute bottom-0 left-0 w-full p-5 z-20">
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <h3 class="text-xl font-bold text-white mb-1">Log Recent Date</h3>
+                                <p class="text-gray-300 text-xs max-w-[200px]">Reflect on your experience while it's fresh. How was the vibe?</p>
+                            </div>
+                            <button id="log-cta-plus" class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-lg hover:bg-blue-500 transition-colors">
+                                <i class="fa-solid fa-plus text-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI Model: Ideal Partner -->
+            <section id="ai-model-section">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-white">Generated "Ideal" Model</h3>
+                    <span class="text-[10px] px-2 py-1 bg-blue-900/30 border border-blue-500/30 text-blue-400 rounded-full">AI Updated</span>
+                </div>
+
+                <div class="bg-dark-800 rounded-xl p-5 border border-slate-700 relative overflow-hidden">
+                    <!-- Decorative glow -->
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-blue-600/5 rounded-full blur-3xl"></div>
+
+                    <div class="flex items-start gap-4 mb-4">
+                        <div class="w-14 h-14 rounded-full border-2 border-dashed border-blue-500/50 flex items-center justify-center bg-slate-800 shrink-0">
+                            <i class="fa-solid fa-wand-magic-sparkles text-blue-400"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-300 leading-relaxed" id="ai-model-text">
+                                Based on your high-rated dates, you connect best with partners who are <span class="text-white font-semibold">creative</span>, value <span class="text-white font-semibold">deep conversation</span> over activities, and prefer <span class="text-white font-semibold">quiet environments</span>.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div>
+                            <div class="flex justify-between text-xs text-gray-400 mb-1">
+                                <span>Intellectual Connection</span>
+                                <span id="ai-intellectual-label">85% Match Importance</span>
+                            </div>
+                            <div class="w-full bg-slate-700 rounded-full h-1.5">
+                                <div id="ai-intellectual-bar" class="bg-gradient-to-r from-blue-600 to-cyan-400 h-1.5 rounded-full" style="width: 85%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs text-gray-400 mb-1">
+                                <span>Shared Values</span>
+                                <span id="ai-values-label">92% Match Importance</span>
+                            </div>
+                            <div class="w-full bg-slate-700 rounded-full h-1.5">
+                                <div id="ai-values-bar" class="bg-gradient-to-r from-blue-600 to-cyan-400 h-1.5 rounded-full" style="width: 92%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analytics Chart -->
+            <section id="analytics-section">
+                <h3 class="text-lg font-bold text-white mb-4">Experience Breakdown</h3>
+                <div class="bg-dark-800 rounded-xl p-2 border border-slate-700 shadow-card">
+                    <div id="radarChart" class="w-full h-[300px]"></div>
+                </div>
+            </section>
+
+            <!-- Recent Logs Feed -->
+            <section id="recent-logs-section">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-white">Recent Logs</h3>
+                    <button id="view-all-logs-btn" class="text-xs text-blue-400 hover:text-blue-300">View all</button>
+                </div>
+
+                <div id="recent-logs-container" class="space-y-3">
+                    <!-- Logs will be rendered from JS; initial template preserved below as reference in JS -->
+                </div>
+            </section>
+        </section>
+
+        <!-- INSIGHTS SCREEN -->
+        <section id="screen-insights" class="screen-hidden space-y-6">
+            <section class="mt-1">
+                <h2 class="text-2xl font-bold mb-1">Insights</h2>
+                <p class="text-gray-400 text-sm mb-4">Patterns from your recent dates.</p>
+            </section>
+
+            <section class="bg-dark-800 rounded-xl p-4 border border-slate-700 space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-sm font-semibold text-white">Emotional Trend</h3>
+                    <span class="text-[10px] px-2 py-1 bg-slate-800 rounded-full text-gray-400">Last 6 dates</span>
+                </div>
+                <div id="insights-chart" class="w-full h-40"></div>
+            </section>
+
+            <section class="bg-dark-800 rounded-xl p-4 border border-slate-700 space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-sm font-semibold text-white">Quick AI Notes</h3>
+                </div>
+                <ul class="text-xs text-gray-300 space-y-2 list-disc list-inside">
+                    <li>You rate conversation higher than activity 70% of the time.</li>
+                    <li>Outdoor dates tend to score 0.8 higher than indoor ones.</li>
+                    <li>Shorter dates (under 2h) correlate with better follow-ups.</li>
+                </ul>
+            </section>
+        </section>
+
+        <!-- JOURNAL SCREEN -->
+        <section id="screen-journal" class="screen-hidden space-y-6">
+            <section class="mt-1">
+                <h2 class="text-2xl font-bold mb-1">Journal</h2>
+                <p class="text-gray-400 text-sm mb-4">Free-form reflections about your connections.</p>
+            </section>
+
+            <section class="bg-dark-800 rounded-xl p-4 border border-slate-700 space-y-4">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-sm font-semibold text-white">New Entry</h3>
+                    <span class="text-[10px] text-gray-500" id="journal-date-label"></span>
+                </div>
+                <textarea id="journal-textarea" class="w-full bg-dark-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none h-32" placeholder="How are you feeling about dating right now?"></textarea>
+                <button id="journal-save-btn" class="w-full h-10 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-floppy-disk text-xs"></i>
+                    Save Entry
+                </button>
+                <p id="journal-status" class="text-[11px] text-green-400 mt-1 hidden">Saved ✓</p>
+            </section>
+
+            <section class="bg-dark-800 rounded-xl p-4 border border-slate-700 space-y-3">
+                <h3 class="text-sm font-semibold text-white">Last Entry</h3>
+                <p id="journal-last-entry" class="text-xs text-gray-300 italic">No entries yet.</p>
+            </section>
+        </section>
+
+        <!-- PROFILE SCREEN -->
+        <section id="screen-profile" class="screen-hidden space-y-6">
+            <section class="mt-1">
+                <h2 class="text-2xl font-bold mb-1">Profile</h2>
+                <p class="text-gray-400 text-sm mb-4">Your preferences & settings.</p>
+            </section>
+
+            <section class="bg-dark-800 rounded-xl p-4 border border-slate-700 space-y-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-neon">
+                        <i class="fa-solid fa-user text-white"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-semibold text-white" id="profile-name">You</h3>
+                        <p class="text-xs text-gray-400">Mindful dater</p>
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-700 pt-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-300">Notifications</span>
+                        <button id="toggle-notifications" class="w-10 h-5 rounded-full bg-slate-700 relative transition-colors">
+                            <span id="toggle-notifications-dot" class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform"></span>
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-300">Show LuckyHunter Loader</span>
+                        <button id="toggle-loader-demo" class="px-2 py-1 rounded-full border border-blue-500/40 text-[11px] text-blue-400 hover:bg-blue-500/10">
+                            Demo
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <!-- LOG FORM SCREEN (MODAL-LIKE, FULL WIDTH) -->
+        <section id="screen-log-form" class="screen-hidden space-y-4">
+            <section class="flex items-center gap-3 mt-1">
+                <button id="log-form-back" class="w-8 h-8 rounded-full bg-dark-800 flex items-center justify-center text-gray-300 hover:bg-dark-700">
+                    <i class="fa-solid fa-chevron-left text-xs"></i>
+                </button>
+                <div>
+                    <h2 class="text-xl font-bold text-white">Log Date</h2>
+                    <p class="text-gray-400 text-xs" id="log-form-date-label"></p>
+                </div>
+            </section>
+
+            <section class="bg-dark-800 rounded-xl p-4 border border-slate-700 space-y-4">
+                <div class="space-y-1">
+                    <label class="text-xs text-gray-300">Partner name</label>
+                    <input id="log-name" type="text" class="w-full bg-dark-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="e.g. Sarah">
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-xs text-gray-300">Location</label>
+                    <input id="log-location" type="text" class="w-full bg-dark-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="e.g. Blue Bottle Coffee">
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-xs text-gray-300 flex justify-between">
+                        <span>Rating</span>
+                        <span id="log-rating-label" class="text-blue-400">3.0</span>
+                    </label>
+                    <input id="log-rating" type="range" min="1" max="5" step="0.1" value="3" class="w-full">
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-xs text-gray-300">Notes</label>
+                    <textarea id="log-notes" class="w-full bg-dark-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none h-24" placeholder="How did it feel? Any red or green flags?"></textarea>
+                </div>
+
+                <button id="log-save-btn" class="w-full h-10 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-check text-xs"></i>
+                    Save log
+                </button>
+                <p id="log-save-status" class="text-[11px] text-green-400 mt-1 hidden">Saved ✓</p>
+            </section>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 z-50 bg-[#0f1523] border-t border-slate-800 pb-safe max-w-[375px] mx-auto">
+        <div class="flex justify-around items-center h-16 px-2">
+            <button data-screen="home" class="nav-item flex flex-col items-center justify-center w-16 h-full space-y-1 active-nav-item">
+                <i class="fa-solid fa-house text-lg"></i>
+                <span class="text-[10px] font-medium">Home</span>
+            </button>
+            <button data-screen="insights" class="nav-item flex flex-col items-center justify-center w-16 h-full space-y-1 text-gray-500 hover:text-gray-300">
+                <i class="fa-solid fa-chart-pie text-lg"></i>
+                <span class="text-[10px] font-medium">Insights</span>
+            </button>
+
+            <!-- Floating Center Button -->
+            <div class="relative -top-5">
+                <button id="center-log-btn" class="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-neon border-4 border-dark-900">
+                    <i class="fa-solid fa-pen-fancy text-xl"></i>
+                </button>
+            </div>
+
+            <button data-screen="journal" class="nav-item flex flex-col items-center justify-center w-16 h-full space-y-1 text-gray-500 hover:text-gray-300">
+                <i class="fa-solid fa-book-open text-lg"></i>
+                <span class="text-[10px] font-medium">Journal</span>
+            </button>
+            <button data-screen="profile" class="nav-item flex flex-col items-center justify-center w-16 h-full space-y-1 text-gray-500 hover:text-gray-300">
+                <i class="fa-solid fa-user text-lg"></i>
+                <span class="text-[10px] font-medium">Profile</span>
+            </button>
+        </div>
+    </nav>
+
+</div>
+
+<!-- App Logic -->
+<script>
+    // ---- SIMPLE IN-MEMORY STATE (можешь заменить на localStorage, если нужно) ----
+    const appState = {
+        currentScreen: 'home',
+        notificationsEnabled: true,
+        logs: [
+            {
+                id: 1,
+                name: 'Sarah',
+                avatar: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-6.jpg',
+                dateLabel: 'Yesterday',
+                location: 'Blue Bottle Coffee',
+                rating: 4.5
+            },
+            {
+                id: 2,
+                name: 'Jessica',
+                avatar: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg',
+                dateLabel: 'Oct 24',
+                location: 'The Jazz Corner',
+                rating: 3.0
+            },
+            {
+                id: 3,
+                name: 'Maya',
+                avatar: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-7.jpg',
+                dateLabel: 'Oct 20',
+                location: 'City Park Walk',
+                rating: 2.1
+            }
+        ],
+        journal: {
+            lastEntry: null
+        }
+    };
+
+    function formatToday() {
+        const d = new Date();
+        return d.toLocaleDateString(undefined, {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+        });
+    }
+
+    function updateJournalMeta() {
+        const label = document.getElementById('journal-date-label');
+        if (label) label.textContent = formatToday();
+    }
+
+    function updateLogFormMeta() {
+        const label = document.getElementById('log-form-date-label');
+        if (label) label.textContent = formatToday();
+    }
+
+    // ----- SCREENS -----
+    function setActiveScreen(name) {
+        appState.currentScreen = name;
+
+        const screens = ['home', 'insights', 'journal', 'profile', 'log-form'];
+        screens.forEach(s => {
+            const el = document.getElementById('screen-' + s);
+            if (!el) return;
+            if (s === name) {
+                el.classList.remove('screen-hidden');
+                el.classList.add('screen-active');
+            } else {
+                el.classList.remove('screen-active');
+                el.classList.add('screen-hidden');
+            }
+        });
+
+        // nav active state
+        document.querySelectorAll('.nav-item').forEach(btn => {
+            btn.classList.remove('active-nav-item');
+            btn.classList.add('text-gray-500');
+            const icon = btn.querySelector('i');
+            if (icon) icon.classList.remove('text-blue-500');
+        });
+
+        const activeNav = document.querySelector('.nav-item[data-screen="' + name + '"]');
+        if (activeNav) {
+            activeNav.classList.add('active-nav-item');
+            activeNav.classList.remove('text-gray-500');
+        }
+
+        // меняем заголовок, но дизайн не ломаем
+        const appTitleMain = document.getElementById('app-title-main');
+        const appTitleSub = document.getElementById('app-title-sub');
+        if (appTitleMain && appTitleSub) {
+            if (name === 'home') {
+                appTitleMain.textContent = 'Date';
+                appTitleSub.textContent = 'Log';
+                appTitleSub.classList.add('text-blue-500');
+            } else {
+                const map = {
+                    insights: 'Insights',
+                    journal: 'Journal',
+                    profile: 'Profile',
+                    'log-form': 'New'
+                };
+                appTitleMain.textContent = map[name] || 'Date';
+                appTitleSub.textContent = name === 'log-form' ? 'Log' : '';
+                if (name === 'log-form') {
+                    appTitleSub.classList.add('text-blue-500');
+                } else {
+                    appTitleSub.classList.remove('text-blue-500');
+                }
+            }
+        }
+
+        if (name === 'insights') {
+            renderInsightsChart();
+        }
+    }
+
+    // ----- RECENT LOGS RENDER -----
+    function ratingColor(r) {
+        if (r >= 4) return 'text-green-400';
+        if (r >= 3) return 'text-yellow-400';
+        return 'text-red-400';
+    }
+
+    function borderColor(r) {
+        if (r >= 4) return 'border-l-green-500';
+        if (r >= 3) return 'border-l-yellow-500';
+        return 'border-l-red-500';
+    }
+
+    function renderRecentLogs() {
+        const container = document.getElementById('recent-logs-container');
+        if (!container) return;
+        container.innerHTML = '';
+
+        appState.logs.slice(0, 5).forEach(log => {
+            const div = document.createElement('div');
+            div.className = `bg-dark-800 rounded-lg p-4 border-l-4 ${borderColor(log.rating)} border-y border-r border-y-slate-700 border-r-slate-700 flex gap-4 items-center hover:bg-slate-800/80 transition-colors cursor-pointer`;
+            div.innerHTML = `
+                <img src="${log.avatar}" alt="${log.name}" class="w-12 h-12 rounded-full object-cover border-2 border-dark-900">
+                <div class="flex-1">
+                    <div class="flex justify-between items-start">
+                        <h4 class="font-semibold text-white">${log.name}</h4>
+                        <span class="text-[10px] text-gray-500">${log.dateLabel}</span>
+                    </div>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="text-xs text-gray-400"><i class="fa-solid fa-location-dot mr-1 text-blue-500"></i>${log.location}</span>
+                    </div>
+                </div>
+                <div class="flex flex-col items-center justify-center bg-slate-900/50 p-2 rounded-lg min-w-[50px]">
+                    <span class="${ratingColor(log.rating)} font-bold text-sm">${log.rating.toFixed(1)}</span>
+                    <div class="flex text-[8px] text-yellow-500 gap-0.5">
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-${log.rating >= 3.5 ? 'solid' : 'regular'} fa-star"></i>
+                    </div>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    // ----- INSIGHTS CHART (simple Plotly line) -----
+    function renderInsightsChart() {
+        const el = document.getElementById('insights-chart');
+        if (!el) return;
+        try {
+            const ratings = appState.logs.map(l => l.rating);
+            const labels = appState.logs.map(l => l.name);
+            const data = [{
+                x: labels,
+                y: ratings,
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: { color: '#3B82F6' },
+                marker: { color: '#60A5FA', size: 6 }
+            }];
+            const layout = {
+                margin: { t: 10, r: 10, b: 30, l: 30 },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                yaxis: {
+                    range: [0, 5],
+                    tickfont: { size: 8, color: '#64748b' },
+                    gridcolor: '#334155',
+                    linecolor: '#334155'
+                },
+                xaxis: {
+                    tickfont: { size: 9, color: '#94a3b8' },
+                    gridcolor: '#1f2937',
+                    linecolor: '#334155'
+                }
+            };
+            Plotly.newPlot(el, data, layout, {
+                responsive: true,
+                displayModeBar: false
+            });
+        } catch (e) {
+            console.error('Insights chart failed', e);
+        }
+    }
+
+    // ----- LUCKYHUNTER LOADER -----
+    function showLuckyLoader(ms = 1200, cb) {
+        const loader = document.getElementById('luckyhunter-loader');
+        if (!loader) {
+            if (cb) cb();
+            return;
+        }
+        loader.style.display = 'flex';
+        loader.style.opacity = '1';
+        loader.style.transition = 'opacity 0.25s ease-out';
+
+        setTimeout(() => {
+            loader.style.opacity = '0';
+            setTimeout(() => {
+                loader.style.display = 'none';
+                if (cb) cb();
+            }, 250);
+        }, ms);
+    }
+
+    // ----- MAIN INIT -----
+    window.addEventListener('load', function() {
+        // Show loader on first load (webview style)
+        showLuckyLoader(900);
+
+        // Radar Chart
+        try {
+            const data = [{
+                type: 'scatterpolar',
+                r: [4.5, 3.8, 4.2, 2.5, 4.0, 4.5],
+                theta: ['Chemistry', 'Conversation', 'Location', 'Value', 'Respect', 'Chemistry'],
+                fill: 'toself',
+                fillcolor: 'rgba(59, 130, 246, 0.2)',
+                line: {
+                    color: '#3B82F6',
+                    width: 2
+                },
+                marker: {
+                    color: '#60A5FA',
+                    size: 4
+                }
+            }];
+
+            const layout = {
+                polar: {
+                    bgcolor: 'rgba(0,0,0,0)',
+                    radialaxis: {
+                        visible: true,
+                        range: [0, 5],
+                        tickfont: { size: 8, color: '#64748b' },
+                        linecolor: '#334155',
+                        gridcolor: '#334155'
+                    },
+                    angularaxis: {
+                        tickfont: { size: 10, color: '#94a3b8' },
+                        linecolor: '#334155',
+                        gridcolor: '#334155'
+                    }
+                },
+                margin: { t: 20, r: 35, b: 20, l: 35 },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                showlegend: false,
+                font: { family: 'Inter, sans-serif' }
+            };
+
+            const config = { responsive: true, displayModeBar: false };
+            Plotly.newPlot('radarChart', data, layout, config);
+        } catch (e) {
+            console.error("Chart loading failed", e);
+        }
+
+        // Render recent logs
+        renderRecentLogs();
+        updateJournalMeta();
+        updateLogFormMeta();
+
+        // NAV buttons
+        document.querySelectorAll('.nav-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const screen = btn.getAttribute('data-screen');
+                if (!screen) return;
+                setActiveScreen(screen);
+            });
+        });
+
+        // Center FAB -> log form
+        document.getElementById('center-log-btn').addEventListener('click', () => {
+            updateLogFormMeta();
+            setActiveScreen('log-form');
+        });
+
+        // CTA card and plus -> log form
+        const ctaCard = document.getElementById('log-cta-card');
+        const ctaPlus = document.getElementById('log-cta-plus');
+        if (ctaCard) {
+            ctaCard.addEventListener('click', (e) => {
+                // не ловим двойной клик, если именно по кнопке
+                if (e.target.closest('button')) return;
+                updateLogFormMeta();
+                setActiveScreen('log-form');
+            });
+        }
+        if (ctaPlus) {
+            ctaPlus.addEventListener('click', (e) => {
+                e.stopPropagation();
+                updateLogFormMeta();
+                setActiveScreen('log-form');
+            });
+        }
+
+        // Back from log-form -> home
+        const backBtn = document.getElementById('log-form-back');
+        if (backBtn) {
+            backBtn.addEventListener('click', () => {
+                setActiveScreen('home');
+            });
+        }
+
+        // Rating range label
+        const ratingInput = document.getElementById('log-rating');
+        const ratingLabel = document.getElementById('log-rating-label');
+        if (ratingInput && ratingLabel) {
+            ratingInput.addEventListener('input', () => {
+                ratingLabel.textContent = parseFloat(ratingInput.value).toFixed(1);
+            });
+        }
+
+        // Save log
+        const saveLogBtn = document.getElementById('log-save-btn');
+        const logStatus = document.getElementById('log-save-status');
+        if (saveLogBtn && logStatus) {
+            saveLogBtn.addEventListener('click', () => {
+                const name = document.getElementById('log-name').value || 'Unknown';
+                const loc = document.getElementById('log-location').value || 'Somewhere';
+                const ratingVal = parseFloat(document.getElementById('log-rating').value || '3');
+                const notes = document.getElementById('log-notes').value || '';
+
+                const newLog = {
+                    id: Date.now(),
+                    name,
+                    avatar: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-6.jpg',
+                    dateLabel: formatToday(),
+                    location: loc,
+                    rating: ratingVal,
+                    notes
+                };
+                appState.logs.unshift(newLog);
+
+                // обновляем чиселки
+                document.getElementById('stats-dates-logged').textContent = appState.logs.length;
+                const avg = appState.logs.reduce((s, l) => s + l.rating, 0) / appState.logs.length;
+                document.getElementById('stats-avg-quality').textContent = avg.toFixed(1);
+
+                renderRecentLogs();
+
+                logStatus.classList.remove('hidden');
+                setTimeout(() => logStatus.classList.add('hidden'), 1200);
+
+                // сброс формы
+                document.getElementById('log-name').value = '';
+                document.getElementById('log-location').value = '';
+                document.getElementById('log-notes').value = '';
+                ratingInput.value = '3';
+                ratingLabel.textContent = '3.0';
+
+                // назад на home
+                setActiveScreen('home');
+            });
+        }
+
+        // Journal save
+        const journalSaveBtn = document.getElementById('journal-save-btn');
+        const journalStatus = document.getElementById('journal-status');
+        const journalTextarea = document.getElementById('journal-textarea');
+        const journalLastEntry = document.getElementById('journal-last-entry');
+        if (journalSaveBtn && journalStatus && journalTextarea && journalLastEntry) {
+            journalSaveBtn.addEventListener('click', () => {
+                const text = journalTextarea.value.trim();
+                if (!text) return;
+                appState.journal.lastEntry = {
+                    text,
+                    date: new Date()
+                };
+                journalLastEntry.textContent = `"${text}"`;
+                journalStatus.classList.remove('hidden');
+                setTimeout(() => journalStatus.classList.add('hidden'), 1200);
+            });
+        }
+
+        // View all logs -> insights screen + slight scroll
+        const viewAllLogsBtn = document.getElementById('view-all-logs-btn');
+        if (viewAllLogsBtn) {
+            viewAllLogsBtn.addEventListener('click', () => {
+                setActiveScreen('insights');
+            });
+        }
+
+        // Notifications toggle (UI only)
+        const notifToggle = document.getElementById('toggle-notifications');
+        const notifDot = document.getElementById('toggle-notifications-dot');
+        if (notifToggle && notifDot) {
+            const applyNotifState = () => {
+                if (appState.notificationsEnabled) {
+                    notifToggle.classList.add('bg-blue-600');
+                    notifToggle.classList.remove('bg-slate-700');
+                    notifDot.style.transform = 'translateX(18px)';
+                } else {
+                    notifToggle.classList.remove('bg-blue-600');
+                    notifToggle.classList.add('bg-slate-700');
+                    notifDot.style.transform = 'translateX(0px)';
+                }
+            };
+            applyNotifState();
+            notifToggle.addEventListener('click', () => {
+                appState.notificationsEnabled = !appState.notificationsEnabled;
+                applyNotifState();
+            });
+        }
+
+        // Demo LuckyHunter loader from Profile
+        const loaderDemoBtn = document.getElementById('toggle-loader-demo');
+        if (loaderDemoBtn) {
+            loaderDemoBtn.addEventListener('click', () => {
+                showLuckyLoader(900);
+            });
+        }
+
+        // Notifications bell click
+        const notifBtn = document.getElementById('notifications-btn');
+        if (notifBtn) {
+            notifBtn.addEventListener('click', () => {
+                // Простое действие без перехода: подсветим, что "нет новых уведомлений"
+                alert('No new notifications yet. Stay mindful ✨');
+            });
+        }
+    });
+</script>
+
+<!-- Minimal blocking of real navigation (но не ломаем наши кнопки, т.к. они button, не a) -->
+<script>
+    (function() {
+        function blockEvent(e) {
+            if (!e) return false;
+            if (typeof e.preventDefault === 'function') e.preventDefault();
+            if (typeof e.stopPropagation === 'function') e.stopPropagation();
+            if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+            return false;
+        }
+
+        // Block all anchor navigations
+        document.addEventListener('click', function(e) {
+            var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+            if (!a) return;
+            return blockEvent(e);
+        }, true);
+
+        // Block form submissions
+        document.addEventListener('submit', function(e) {
+            return blockEvent(e);
+        }, true);
+
+        // Neutralize programmatic navigation attempts
+        try { window.open = function() { return null }; } catch (_) {}
+        try {
+            var noop = function(){};
+            history.pushState = noop;
+            history.replaceState = noop;
+        } catch (_) {}
+        try {
+            if (window.location) {
+                window.location.assign = function(){};
+                window.location.replace = function(){};
+            }
+        } catch (_) {}
+    })();
+</script>
+</body>
+</html>
