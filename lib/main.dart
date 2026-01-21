@@ -65,7 +65,7 @@ class LuckyHunterNetworkService {
 
   Future<bool> luckyHunterIsOnline() async {
     final List<ConnectivityResult> luckyHunterResults =
-    await luckyHunterLogger.luckyHunterConnectivity.checkConnectivity();
+    (await luckyHunterLogger.luckyHunterConnectivity.checkConnectivity()) as List<ConnectivityResult>;
     return luckyHunterResults.isNotEmpty &&
         !luckyHunterResults.contains(ConnectivityResult.none);
   }
