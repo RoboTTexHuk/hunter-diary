@@ -25,15 +25,12 @@ import 'package:timezone/timezone.dart' as tz_zone;
 
 import 'luckdairy.dart';
 
-// ЗАМЕНИ на твои реальные файлы, если имена другие
-// если нужно, можно удалить, если не используется.
-
 // ============================================================================
 // Константы
 // ============================================================================
 
 const String goldLuxuryLoadedOnceKey = 'loaded_once';
-const String goldLuxuryStatEndpoint = 'https://apisrc.diaryh.online/ stat';
+const String goldLuxuryStatEndpoint = 'https://apisrc.diaryh.online/stat';
 const String goldLuxuryCachedFcmKey = 'cached_fcm';
 const String goldLuxuryCachedDeepKey = 'cached_deep_push_uri';
 
@@ -65,7 +62,8 @@ class LuckyHunterNetworkService {
 
   Future<bool> luckyHunterIsOnline() async {
     final List<ConnectivityResult> luckyHunterResults =
-    (await luckyHunterLogger.luckyHunterConnectivity.checkConnectivity()) as List<ConnectivityResult>;
+    (await luckyHunterLogger.luckyHunterConnectivity.checkConnectivity())
+    as List<ConnectivityResult>;
     return luckyHunterResults.isNotEmpty &&
         !luckyHunterResults.contains(ConnectivityResult.none);
   }
@@ -170,8 +168,8 @@ class LuckyHunterAnalyticsSpyService {
     );
 
     luckyHunterAppsFlyerSdk?.startSDK(
-      onSuccess: () =>
-          LuckyHunterLoggerService().luckyHunterLogInfo('GoldenLuxuryAnalyticsSpy started'),
+      onSuccess: () => LuckyHunterLoggerService()
+          .luckyHunterLogInfo('GoldenLuxuryAnalyticsSpy started'),
       onError: (code, msg) => LuckyHunterLoggerService()
           .luckyHunterLogError('GoldenLuxuryAnalyticsSpy error $code: $msg'),
     );
@@ -187,8 +185,6 @@ class LuckyHunterAnalyticsSpyService {
     });
   }
 }
-
-
 
 // ============================================================================
 // FCM фоновые крики
@@ -368,7 +364,7 @@ class _LuckyHunterHallState extends State<LuckyHunterHall> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Center(
+      body: const Center(
         child: LuckyHunterNeonLoader(),
       ),
     );
@@ -636,6 +632,7 @@ class _LuckyHunterHarborState extends State<LuckyHunterHarbor>
     luckyHunterFirstPageTimestamp =
         DateTime.now().millisecondsSinceEpoch;
 
+    // Убираем cover через 2 секунды
     Future<void>.delayed(const Duration(seconds: 2), () {
       if (mounted) {
         setState(() {
@@ -644,6 +641,7 @@ class _LuckyHunterHarborState extends State<LuckyHunterHarbor>
       }
     });
 
+    // Показываем veil через 7 секунд
     Future<void>.delayed(const Duration(seconds: 7), () {
       if (!mounted) return;
       setState(() {
@@ -652,6 +650,7 @@ class _LuckyHunterHarborState extends State<LuckyHunterHarbor>
     });
 
     luckyHunterBootHarbor();
+    luckyHunterBindNotificationTap();
   }
 
   Future<void> luckyHunterLoadLoadedFlag() async {
@@ -718,7 +717,6 @@ class _LuckyHunterHarborState extends State<LuckyHunterHarbor>
     luckyHunterAnalyticsSpyService.luckyHunterStartTracking(
       onUpdate: () => setState(() {}),
     );
-    luckyHunterBindNotificationTap();
     luckyHunterPrepareDeviceProfile();
 
     Future<void>.delayed(const Duration(seconds: 6), () async {
@@ -1195,7 +1193,6 @@ class _LuckyHunterHarborState extends State<LuckyHunterHarbor>
   @override
   Widget build(BuildContext context) {
     luckyHunterBindNotificationTap();
-
     Widget luckyHunterContent = Stack(
       children: <Widget>[
         if (luckyHunterCoverVisible)
@@ -1250,15 +1247,19 @@ class _LuckyHunterHarborState extends State<LuckyHunterHarbor>
 
                             print("Server responseDD: $luckyHunterSavedata");
 
+                            // <<< ТВОЯ ЛОГИКА SAFE AREA >>>
+                            // false  -> включаем SafeArea
+                            // true   -> выключаем SafeArea
                             if (luckyHunterSavedata == "false") {
-                              Navigator.pushReplacement<void, void>(
-                                context,
-                                MaterialPageRoute<void>(
-                                  builder: (BuildContext context) =>
-                                  LuckyHunterHelpLite(),
-                                ),
-                              );
-                            } else if (luckyHunterSavedata == "true") {}
+                              setState(() {
+                                luckyHunterUseSafeArea = true;
+                              });
+                            } else if (luckyHunterSavedata == "true") {
+                              setState(() {
+                                luckyHunterUseSafeArea = false;
+                              });
+                            }
+                            // <<< КОНЕЦ ИЗМЕНЕНИЙ >>>
                           }
                         } catch (_) {}
 
